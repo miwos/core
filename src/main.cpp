@@ -20,10 +20,13 @@ void setup() {
   FileSystem::begin();
   Lua::begin();
 
-  Lua::onSetup([]() {
-    LuaLog::install();
-    LuaFileSystem::install();
-    LuaTimer::install();
+  // Simple echo, useful for debugging bridge communication between the miwos
+  // app and device.
+  Bridge::addMethod("/echo/int", [](Data &data) {
+    RequestId id = data.getInt(0);
+    if (!Bridge::validateData(data, "ii", 2)) return Bridge::respondError(id);
+    auto number = data.getInt(1);
+    Bridge::respond(id, number);
   });
 }
 
