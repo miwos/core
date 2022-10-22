@@ -2,23 +2,35 @@
 #include <Bridge.h>
 #include <FileSystem.h>
 #include <Lua.h>
+#include <LuaBridge.h>
 #include <LuaFileSystem.h>
 #include <LuaLog.h>
 #include <LuaTimer.h>
 #include <SlipSerial.h>
 
-SlipSerial serial(Serial);
+using Bridge::Data;
+using Bridge::RequestId;
 
-int ref;
+SlipSerial serial(Serial);
 
 void setup() {
   Serial.begin(9600);
   while (!Serial) {
   }
 
+  Lua::onSetup([]() {
+    LuaBridge::install();
+    LuaFileSystem::install();
+    LuaTimer::install();
+    LuaLog::install();
+  });
+
   Bridge::begin(serial);
+  LuaBridge::begin();
   FileSystem::begin();
   Lua::begin();
+
+  Lua::runFile("lua/init.lua");
 
   // Simple echo, useful for debugging bridge communication between the miwos
   // app and device.
