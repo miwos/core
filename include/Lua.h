@@ -98,57 +98,6 @@ namespace Lua {
     }
   } // namespace
 
-  int storeFunction(const char *tableName, const char *functionName) {
-    lua_getglobal(L, tableName);
-    if (!lua_istable(L, -1)) {
-      lua_pop(L, 1); // Remove the table.
-      return -1;
-    }
-
-    lua_getfield(L, -1, functionName);
-    lua_remove(L, -2); // Remove the table.
-
-    if (!isFunction(functionName, -1, false)) {
-      lua_pop(L, 1); // Remove the function.
-      return -1;
-    }
-
-    int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-    lua_pop(L, 1); // Remove the function.
-    return ref;
-  }
-
-  int storeFunction(const char *functionName) {
-    lua_getglobal(L, functionName);
-
-    if (!lua_isfunction(L, -1) && !lua_islightfunction(L, -1)) {
-      // Remove the (nil) function.
-      lua_pop(L, 1);
-      return -1;
-    }
-
-    int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-    // Remove the function.
-    lua_pop(L, 1);
-    return ref;
-  }
-
-  bool getFunction(int ref, bool shouldLogError = true) {
-    lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
-
-    if (!lua_isfunction(L, -1) && !lua_islightfunction(L, -1)) {
-      if (shouldLogError) {
-        Logger::beginError();
-        Bridge::serial->printf(F("can't find function ref `%d`"), ref);
-        Logger::endLog();
-      }
-      lua_pop(L, 1); // Remove the function.
-      return false;
-    }
-
-    return true;
-  }
-
   bool getFunction(const char *functionName, bool shouldLogError = true) {
     lua_getglobal(L, functionName);
 
@@ -178,6 +127,38 @@ namespace Lua {
     lua_remove(L, -2); // Remove the table.
 
     if (!isFunction(functionName, -1, shouldLogError)) {
+      lua_pop(L, 1); // Remove the function.
+      return false;
+    }
+
+    return true;
+  }
+
+  int storeFunction(const char *tableName, const char *functionName,
+      bool shouldLogError = true) {
+    if (!getFunction(tableName, functionName, shouldLogError)) return -1;
+    int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+    lua_pop(L, 1); // Remove the function.
+    return ref;
+  }
+
+  int storeFunction(const char *functionName, bool shouldLogError = true) {
+    if (!getFunction(functionName, shouldLogError)) return -1;
+    int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+    // Remove the function.
+    lua_pop(L, 1);
+    return ref;
+  }
+
+  bool getFunction(int ref, bool shouldLogError = true) {
+    lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+
+    if (!lua_isfunction(L, -1) && !lua_islightfunction(L, -1)) {
+      if (shouldLogError) {
+        Logger::beginError();
+        Bridge::serial->printf(F("can't find function ref `%d`"), ref);
+        Logger::endLog();
+      }
       lua_pop(L, 1); // Remove the function.
       return false;
     }
