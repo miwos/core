@@ -13,7 +13,7 @@ namespace LuaBridge {
   };
 
   void begin() {
-    Bridge::addMethod("/*/*", [](Data &data) {
+    Bridge::addMethod("/e/*/*", [](Data &data) {
       RequestId id = data.getInt(0);
       byte numArguments = data.size();
 
