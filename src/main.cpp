@@ -5,7 +5,9 @@
 #include <LuaBridge.h>
 #include <LuaFileSystem.h>
 #include <LuaLog.h>
+#include <LuaMidi.h>
 #include <LuaTimer.h>
+#include <MidiDevices.h>
 #include <SlipSerial.h>
 
 using Bridge::Data;
@@ -21,14 +23,18 @@ void setup() {
   Lua::onSetup([]() {
     LuaBridge::install();
     LuaFileSystem::install();
-    LuaTimer::install();
     LuaLog::install();
+    LuaMidi::install();
+    LuaTimer::install();
   });
 
   Bridge::begin(serial);
+  MidiDevices::begin();
+
+  Lua::begin();
   LuaBridge::begin();
   FileSystem::begin();
-  Lua::begin();
+  LuaMidi::begin();
 
   Lua::runFile("lua/init.lua");
 
@@ -44,5 +50,6 @@ void setup() {
 
 void loop() {
   Bridge::update();
+  MidiDevices::update();
   LuaTimer::update();
 }
