@@ -21,8 +21,6 @@ SlipSerial serial(Serial);
 
 void setup() {
   Serial.begin(9600);
-  while (!Serial) {
-  }
 
   Lua::onSetup([]() {
     LuaBridge::install();
