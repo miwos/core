@@ -1,10 +1,12 @@
 #include <Arduino.h>
 #include <Bridge.h>
 #include <Displays.h>
+#include <Encoders.h>
 #include <FileSystem.h>
 #include <Lua.h>
 #include <LuaBridge.h>
 #include <LuaDisplays.h>
+#include <LuaEncoders.h>
 #include <LuaFileSystem.h>
 #include <LuaLog.h>
 #include <LuaMidi.h>
@@ -25,6 +27,7 @@ void setup() {
   Lua::onSetup([]() {
     LuaBridge::install();
     LuaDisplays::install();
+    LuaEncoders::install();
     LuaFileSystem::install();
     LuaLog::install();
     LuaMidi::install();
@@ -33,11 +36,12 @@ void setup() {
 
   Bridge::begin(serial);
   Displays::begin();
+  FileSystem::begin();
   MidiDevices::begin();
 
   Lua::begin();
   LuaBridge::begin();
-  FileSystem::begin();
+  LuaEncoders::begin();
   LuaMidi::begin();
 
   Lua::runFile("lua/init.lua");
@@ -54,6 +58,7 @@ void setup() {
 
 void loop() {
   Bridge::update();
+  Encoders::update();
   MidiDevices::update();
   LuaTimer::update();
 }
