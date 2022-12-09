@@ -10,6 +10,8 @@ private:
   int32_t max = 127;
   int32_t value = 0;
 
+  bool ignoreChangeOnce = false;
+
   int32_t constrainValue(int32_t value) {
     if (value < min) {
       value = 0;
@@ -40,13 +42,24 @@ public:
   }
 
   int32_t read(bool &changed) {
+    // If we manually write to an encoder, we don't want to trigger a change.
+    // Only changes caused by the encoder itself are considered.
+    if (ignoreChangeOnce) {
+      changed = false;
+      ignoreChangeOnce = false;
+      return read();
+    }
+
     int32_t oldValue = value;
     int32_t value = read();
     changed = value != oldValue;
     return value;
   }
 
-  void write(int32_t value) { encoder->write(value); }
+  void write(int32_t value) {
+    ignoreChangeOnce = true;
+    encoder->write(value);
+  }
 
   ~RangeEncoder() { delete encoder; }
 };
