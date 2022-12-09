@@ -63,8 +63,6 @@ void setup() {
     auto number = data.getInt(1);
     Bridge::respond(id, number);
   });
-
-  Serial.println("setup completed");
 }
 
 void loop() {
