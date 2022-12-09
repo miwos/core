@@ -25,6 +25,7 @@ namespace Displays {
     display->clearDisplay();
     display->setFont(&vevey_pixel_12pt);
     display->setTextColor(WHITE);
+    display->display();
   }
 
   void begin() {
