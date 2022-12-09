@@ -18,7 +18,7 @@ namespace LuaButtons {
     if (!Lua::getFunction("Buttons", "handleClick")) return;
     lua_pushinteger(Lua::L, encoderIndex + 1); // one-based index
     lua_pushinteger(Lua::L, duration);
-    lua_call(Lua::L, 2, 0);
+    Lua::check(lua_pcall(Lua::L, 2, 0, 0));
   }
 
   void begin() { Buttons::onClick(handleClick); }

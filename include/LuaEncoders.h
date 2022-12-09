@@ -27,7 +27,7 @@ namespace LuaEncoders {
     if (!Lua::getFunction("Encoders", "handleChange")) return;
     lua_pushinteger(Lua::L, encoderIndex + 1); // one-based index
     lua_pushinteger(Lua::L, value);
-    lua_call(Lua::L, 2, 0);
+    Lua::check(lua_pcall(Lua::L, 2, 0, 0));
   }
 
   void begin() { Encoders::onChange(handleChange); }

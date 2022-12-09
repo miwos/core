@@ -26,7 +26,7 @@ namespace Lua {
   bool check(int luaHasError) {
     if (luaHasError) {
       Logger::beginError();
-      Bridge::serial->print(lua_tostring(L, -1));
+      Logger::serial->print(lua_tostring(L, -1));
       Logger::endLog();
       lua_pop(L, 1);
     }

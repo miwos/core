@@ -50,7 +50,7 @@ namespace LuaMidi {
     lua_pushnumber(Lua::L, data2);
     lua_pushnumber(Lua::L, channel);   // Channel is already a one-based index.
     lua_pushnumber(Lua::L, cable + 1); // Use one-based index.
-    lua_call(Lua::L, 6, 0);
+    Lua::check(lua_pcall(Lua::L, 6, 0, 0));
   }
 
   void begin() {

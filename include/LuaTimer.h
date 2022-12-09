@@ -32,7 +32,9 @@ namespace LuaTimer {
 
     if (Lua::getFunction(updateRef, false)) {
       lua_pushinteger(Lua::L, currentTime);
-      lua_pcall(Lua::L, 1, 0, 0);
+      // ? Maybe add a debug flag and use lua_call instead of lua_pcall in
+      // ? production because it is faster.
+      Lua::check(lua_pcall(Lua::L, 1, 0, 0));
     }
   }
 } // namespace LuaTimer
