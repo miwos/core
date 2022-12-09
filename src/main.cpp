@@ -1,10 +1,12 @@
 #include <Arduino.h>
 #include <Bridge.h>
+#include <Buttons.h>
 #include <Displays.h>
 #include <Encoders.h>
 #include <FileSystem.h>
 #include <Lua.h>
 #include <LuaBridge.h>
+#include <LuaButtons.h>
 #include <LuaDisplays.h>
 #include <LuaEncoders.h>
 #include <LuaFileSystem.h>
@@ -21,9 +23,12 @@ SlipSerial serial(Serial);
 
 void setup() {
   Serial.begin(9600);
+  while (!Serial) {
+  }
 
   Lua::onSetup([]() {
     LuaBridge::install();
+    LuaButtons::install();
     LuaDisplays::install();
     LuaEncoders::install();
     LuaFileSystem::install();
@@ -33,16 +38,22 @@ void setup() {
   });
 
   Bridge::begin(serial);
+  Buttons::begin();
   Displays::begin();
   FileSystem::begin();
   MidiDevices::begin();
 
   Lua::begin();
   LuaBridge::begin();
+  LuaButtons::begin();
   LuaEncoders::begin();
   LuaMidi::begin();
 
-  Lua::runFile("lua/init.lua");
+  // Prevent auto-running `init.lua` by holding down the menu button when
+  // powering on the device. This is useful for debugging, for example if there
+  // is an infinite loop in `init.lua` that would cause the device to freeze
+  // immediately at startup.
+  if (!Buttons::buttons[9]->read()) Lua::runFile("lua/init.lua");
 
   // Simple echo, useful for debugging bridge communication between the miwos
   // app and device.
@@ -52,10 +63,13 @@ void setup() {
     auto number = data.getInt(1);
     Bridge::respond(id, number);
   });
+
+  Serial.println("setup completed");
 }
 
 void loop() {
   Bridge::update();
+  Buttons::update();
   Encoders::update();
   MidiDevices::update();
   LuaTimer::update();
