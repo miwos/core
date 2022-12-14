@@ -4,12 +4,14 @@
 #include <Displays.h>
 #include <Encoders.h>
 #include <FileSystem.h>
+#include <Leds.h>
 #include <Lua.h>
 #include <LuaBridge.h>
 #include <LuaButtons.h>
 #include <LuaDisplays.h>
 #include <LuaEncoders.h>
 #include <LuaFileSystem.h>
+#include <LuaLeds.h>
 #include <LuaLog.h>
 #include <LuaMidi.h>
 #include <LuaTimer.h>
@@ -32,6 +34,7 @@ void setup() {
     LuaDisplays::install();
     LuaEncoders::install();
     LuaFileSystem::install();
+    LuaLeds::install();
     LuaLog::install();
     LuaMidi::install();
     LuaTimer::install();
@@ -41,6 +44,7 @@ void setup() {
   Buttons::begin();
   Displays::begin();
   FileSystem::begin();
+  Leds::begin();
   MidiDevices::begin();
 
   Lua::begin();
