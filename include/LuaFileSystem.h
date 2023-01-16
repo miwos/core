@@ -5,10 +5,12 @@
 #include <Lua.h>
 
 namespace LuaFileSystem {
+  using FileSystem::sd;
+
   char fileName[FileSystem::maxFileNameLength];
 
-  int_fast32_t listFiles(lua_State *L) {
-    const char *dirName = luaL_checkstring(L, -1);
+  int listFiles(lua_State *L) {
+    const char *dirName = luaL_checkstring(L, 1);
 
     FatFile dir;
     FatFile file;
@@ -35,8 +37,30 @@ namespace LuaFileSystem {
     return 1;
   }
 
+  int fileExists(lua_State *L) {
+    const char *fileName = luaL_checkstring(L, 1);
+    lua_pushboolean(L, sd.exists(fileName));
+    return 1;
+  }
+
+  int writeFile(lua_State *L) {
+    const char *fileName = luaL_checkstring(L, 1);
+    const char *content = luaL_checkstring(L, 2);
+    bool overwrite = lua_toboolean(L, 3);
+    FatFile file;
+
+    if (overwrite && sd.exists(fileName)) sd.remove(fileName);
+    file.open(fileName, FILE_WRITE);
+    int result = file.write(content);
+    file.close();
+
+    lua_pushboolean(L, result > -1);
+    return 1;
+  }
+
   void install() {
-    luaL_Reg lib[] = {{"listFiles", listFiles}, {NULL, NULL}};
+    luaL_Reg lib[] = {{"listFiles", listFiles}, {"fileExists", fileExists},
+        {"writeFile", writeFile}, {NULL, NULL}};
     luaL_register(Lua::L, "FileSystem", lib);
   }
 } // namespace LuaFileSystem
