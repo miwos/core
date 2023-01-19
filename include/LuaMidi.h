@@ -1,11 +1,17 @@
 #ifndef LuaMidi_h
 #define LuaMidi_h
 
+#include <IntervalTimer.h>
 #include <Lua.h>
 #include <MidiDevices.h>
 
 namespace LuaMidi {
   int handleInputRef = -1;
+  int handleClockRef = -1;
+  volatile bool nextTick = false;
+  IntervalTimer clockTimer;
+  float bpm = 120.0;
+  int ppq = 24;
 
   int send(lua_State *L) {
     byte index = lua_tonumber(L, 1) - 1; // Use zero-based index.
@@ -53,6 +59,31 @@ namespace LuaMidi {
     Lua::check(lua_pcall(Lua::L, 6, 0, 0));
   }
 
+  void handleMidiClock() {
+    // TODO: sync selected midi devices
+    usbMIDI.sendRealTime(usbMIDI.Clock);
+  }
+
+  int start(lua_State *L) {
+    // TODO: sync selected midi devices
+    usbMIDI.sendRealTime(usbMIDI.Start);
+    clockTimer.begin(handleMidiClock, (60000000 / bpm) / ppq);
+    return 0;
+  }
+
+  int setTempo(lua_State *L) {
+    bpm = luaL_checknumber(L, 1);
+    clockTimer.update((60000000 / bpm) / ppq);
+    return 0;
+  }
+
+  int stop(lua_State *L) {
+    // TODO: sync selected midi devices
+    usbMIDI.sendRealTime(usbMIDI.Stop);
+    clockTimer.end();
+    return 0;
+  }
+
   void begin() {
     for (byte i = 0; i < MidiDevices::maxDevices; i++) {
       AnyMidi *device = MidiDevices::getDevice(i);
@@ -62,8 +93,11 @@ namespace LuaMidi {
 
   void install() {
     handleInputRef = -1;
+    handleClockRef = -1;
+
     luaL_Reg lib[] = {{"__send", send}, {"__getNoteId", getNoteId},
-        {"parseNoteId", parseNoteId}, {NULL, NULL}};
+        {"parseNoteId", parseNoteId}, {"start", start}, {"stop", stop},
+        {"setTempo", setTempo}, {NULL, NULL}};
     luaL_register(Lua::L, "Midi", lib);
   }
 } // namespace LuaMidi
