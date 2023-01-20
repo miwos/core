@@ -7,6 +7,13 @@
 namespace LuaDisplays {
   using Displays::Display;
 
+  int needsUpdate[Displays::maxDisplays] = {false};
+  // A display update is ~12ms. If all three displays need an update 24fps would
+  // still leave enough time to draw all of them.
+  byte fps = 24;
+  uint32_t frameDuration = 1000 / fps; // ms
+  uint32_t lastFrameTime = 0;
+
   int text(lua_State *L) {
     byte index = luaL_checknumber(L, 1) - 1; // Use zero-based index.
     const char *text = luaL_checkstring(L, 2);
@@ -135,10 +142,9 @@ namespace LuaDisplays {
     return 0;
   }
 
-  int update(lua_State *L) {
+  int updateDisplay(lua_State *L) {
     byte index = lua_tonumber(L, 1) - 1; // Use zero-based index.
-    Display *display = Displays::getDisplay(index);
-    if (display != NULL) display->display();
+    if (Displays::getDisplay(index) != NULL) needsUpdate[index] = true;
     return 0;
   }
 
@@ -149,12 +155,25 @@ namespace LuaDisplays {
     return 0;
   }
 
+  void update() {
+    uint32_t now = millis();
+    if (now - lastFrameTime >= frameDuration) {
+      for (int i = 0; i < Displays::maxDisplays; i++) {
+        if (!needsUpdate[i]) continue;
+        Display *display = Displays::getDisplay(i);
+        if (display != NULL) display->display();
+        needsUpdate[i] = false;
+      }
+      lastFrameTime = now;
+    }
+  }
+
   void install() {
     luaL_Reg lib[] = {{"text", text}, {"drawPixel", drawPixel},
         {"drawLine", drawLine}, {"drawTriangle", drawTriangle},
         {"drawRectangle", drawRectangle},
         {"drawRoundedRectangle", drawRoundedRectangle},
-        {"drawCircle", drawCircle}, {"update", update}, {"clear", clear},
+        {"drawCircle", drawCircle}, {"update", updateDisplay}, {"clear", clear},
         {NULL, NULL}};
     luaL_register(Lua::L, "Displays", lib);
   }

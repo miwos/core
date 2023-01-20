@@ -18,10 +18,7 @@
 #include <MidiDevices.h>
 #include <SlipSerial.h>
 
-#define DEBUG ;
-#define DEBUG_LOOP_PERF ;
-
-#if defined(DEBUG) && defined(DEBUG_LOOP_PERF)
+#if defined(DEBUG) && defined(DEBUG_LOOP)
 uint32_t lastLoopTime = 0;
 uint32_t maxLoopInterval = 0;
 uint32_t lastLoopLogTime = 0;
@@ -85,8 +82,9 @@ void loop() {
   Encoders::update();
   MidiDevices::update();
   LuaTimer::update();
+  LuaDisplays::update();
 
-#if defined(DEBUG) && defined(DEBUG_LOOP_PERF)
+#if defined(DEBUG) && defined(DEBUG_LOOP)
   uint32_t now = micros();
   maxLoopInterval = max(maxLoopInterval, now - lastLoopTime);
 
