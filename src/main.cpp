@@ -18,6 +18,16 @@
 #include <MidiDevices.h>
 #include <SlipSerial.h>
 
+#define DEBUG ;
+#define DEBUG_LOOP_PERF ;
+
+#if defined(DEBUG) && defined(DEBUG_LOOP_PERF)
+uint32_t lastLoopTime = 0;
+uint32_t maxLoopInterval = 0;
+uint32_t lastLoopLogTime = 0;
+uint32_t loopLogInterval = 1000000;
+#endif
+
 using Bridge::Data;
 using Bridge::RequestId;
 
@@ -75,4 +85,24 @@ void loop() {
   Encoders::update();
   MidiDevices::update();
   LuaTimer::update();
+
+#if defined(DEBUG) && defined(DEBUG_LOOP_PERF)
+  uint32_t now = micros();
+  maxLoopInterval = max(maxLoopInterval, now - lastLoopTime);
+
+  if (now - lastLoopLogTime >= loopLogInterval) {
+    const char *color = maxLoopInterval < 100   ? "success"
+                        : maxLoopInterval < 500 ? "warn"
+                                                : "error";
+
+    Logger::beginInfo();
+    Logger::serial->printf(
+        F("{gray Loop interval:} {%s %dμs}\n"), color, maxLoopInterval);
+    Logger::endInfo();
+    lastLoopLogTime = now;
+    maxLoopInterval = 0;
+  }
+
+  lastLoopTime = now;
+#endif
 }
