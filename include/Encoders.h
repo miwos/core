@@ -14,6 +14,7 @@ namespace Encoders {
 
   const byte maxEncoders = 3;
   uint32_t lastUpdate = 0;
+  uint32_t updateInterval = 5; // ms
   RangeEncoder *encoders[maxEncoders] = {&encoder1, &encoder2, &encoder3};
 
   RangeEncoder *getEncoder(byte index) {
@@ -28,9 +29,8 @@ namespace Encoders {
   }
 
   void update() {
-    // Throttle update to once every millisecond.
-    uint32_t currentTime = millis();
-    if (lastUpdate == currentTime) return;
+    uint32_t now = millis();
+    if (now - lastUpdate < updateInterval) return;
 
     for (byte i = 0; i < maxEncoders; i++) {
       bool changed;
@@ -38,7 +38,7 @@ namespace Encoders {
       if (changed && handleChange != NULL) handleChange(i, value);
     }
 
-    lastUpdate = currentTime;
+    lastUpdate = now;
   }
 
   void onChange(ChangeHandler handler) { handleChange = handler; }
