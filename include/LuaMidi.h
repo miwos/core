@@ -3,15 +3,16 @@
 
 #include <IntervalTimer.h>
 #include <Lua.h>
+#include <LuaTimer.h>
 #include <MidiDevices.h>
 
 namespace LuaMidi {
   int handleInputRef = -1;
   int handleClockRef = -1;
-  volatile bool nextTick = false;
   IntervalTimer clockTimer;
   float bpm = 120.0;
   int ppq = 24;
+  uint32_t currentTick = 0;
 
   int send(lua_State *L) {
     byte index = lua_tonumber(L, 1) - 1; // Use zero-based index.
@@ -59,9 +60,26 @@ namespace LuaMidi {
     Lua::check(lua_pcall(Lua::L, 6, 0, 0));
   }
 
+  void handleTimerEvent(uint32_t data) {
+    uint32_t message = data >> 8;
+    byte status = message >> 16;
+    byte type = status & 0xF0;
+    byte channel = (status & 15) + 1; // Channel is stored zero-based.
+    byte data1 = (message >> 8) & 127;
+    byte data2 = message & 127;
+    byte deviceIndex = (data >> 4) & 15;
+    byte cable = data & 15;
+
+    AnyMidi *device = MidiDevices::getDevice(deviceIndex);
+    if (device != NULL) device->send(type, data1, data2, channel, cable);
+  }
+
   void handleMidiClock() {
     // TODO: sync selected midi devices
     usbMIDI.sendRealTime(usbMIDI.Clock);
+    LuaTimer::updateEvents(currentTick, true);
+    currentTick++;
+    LuaTimer::currentTick = currentTick;
   }
 
   int start(lua_State *L) {
@@ -89,6 +107,7 @@ namespace LuaMidi {
       AnyMidi *device = MidiDevices::getDevice(i);
       device->onInput(handleInput);
     }
+    LuaTimer::onEvent(handleTimerEvent);
   }
 
   void install() {
