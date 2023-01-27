@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <Button.h>
+#include <Logger.h>
 
 // Blue buttons
 Button button1(10);
