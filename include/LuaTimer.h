@@ -67,10 +67,6 @@ namespace LuaTimer {
     uint32_t message = (status << 16) | (data1 << 8) | data2;
     uint32_t data = (message << 8) | (deviceIndex << 4) | cable;
 
-    Logger::beginInfo();
-    Serial.println(data);
-    Logger::endInfo();
-
     // To save some space, we store wether to use ticks or ms as a flag in the
     // most significant bit (32). This bit is already used by the midi message
     // but only to indicate a status byte (which for the first byte in a midi
