@@ -59,8 +59,11 @@ namespace BridgeLib {
         return Bridge::respond(id);
       } else {
         Bridge::beginRespondError(id);
-        Bridge::serial->printf("return type `%s` not supported in request `%s`",
-            lua_typename(Lua::L, -1), address);
+        Bridge::serial->printf(
+          "return type `%s` not supported in request `%s`",
+          lua_typename(Lua::L, -1),
+          address
+        );
         Bridge::endRespond();
       }
     });

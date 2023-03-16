@@ -21,7 +21,9 @@ namespace Lua {
   StdioStream file;
   SetupHandler handleSetup;
 
-  void onSetup(SetupHandler handler) { handleSetup = handler; }
+  void onSetup(SetupHandler handler) {
+    handleSetup = handler;
+  }
 
   bool check(int luaHasError) {
     if (luaHasError) {
@@ -35,9 +37,10 @@ namespace Lua {
 
   namespace {
     bool isFunction(
-        const char *name, int stackIndex, bool shouldLogError = true) {
+      const char *name, int stackIndex, bool shouldLogError = true
+    ) {
       bool isFunction =
-          lua_isfunction(L, stackIndex) || lua_islightfunction(L, stackIndex);
+        lua_isfunction(L, stackIndex) || lua_islightfunction(L, stackIndex);
 
       if (!isFunction && shouldLogError) {
         Logger::beginError();
@@ -83,18 +86,20 @@ namespace Lua {
     void addPolyfills() {
       lua_register(L, "loadfile", loadFile);
       lua_register(L, "loadModule", loadModule);
-      check(luaL_dostring(L,
-          "_LOADED = {}\n"
-          "function require(name)\n"
-          "  if _LOADED[name] == nil then\n"
-          "    local root = 'lua/'\n"
-          "    local path = root .. string.gsub(name, '%.', '/')\n"
-          "    local module = assert(loadModule(path), 'failed to load module "
-          "' .. name)\n"
-          "    _LOADED[name] = module()\n"
-          "  end\n"
-          "  return _LOADED[name]\n"
-          "end\n"));
+      check(luaL_dostring(
+        L,
+        "_LOADED = {}\n"
+        "function require(name)\n"
+        "  if _LOADED[name] == nil then\n"
+        "    local root = 'lua/'\n"
+        "    local path = root .. string.gsub(name, '%.', '/')\n"
+        "    local module = assert(loadModule(path), 'failed to load module "
+        "' .. name)\n"
+        "    _LOADED[name] = module()\n"
+        "  end\n"
+        "  return _LOADED[name]\n"
+        "end\n"
+      ));
     }
   } // namespace
 
@@ -109,8 +114,9 @@ namespace Lua {
     return true;
   }
 
-  bool getFunction(const char *tableName, const char *functionName,
-      bool shouldLogError = true) {
+  bool getFunction(
+    const char *tableName, const char *functionName, bool shouldLogError = true
+  ) {
     lua_getglobal(L, tableName);
     if (!lua_istable(L, -1)) {
       if (shouldLogError) {
@@ -134,8 +140,9 @@ namespace Lua {
     return true;
   }
 
-  int storeFunction(const char *tableName, const char *functionName,
-      bool shouldLogError = true) {
+  int storeFunction(
+    const char *tableName, const char *functionName, bool shouldLogError = true
+  ) {
     if (!getFunction(tableName, functionName, shouldLogError)) return -1;
     int ref = luaL_ref(L, LUA_REGISTRYINDEX);
     lua_pop(L, 1); // Remove the function.
@@ -183,7 +190,9 @@ namespace Lua {
     setup();
   }
 
-  bool runFile(const char *fileName) { return check(luaL_dofile(L, fileName)); }
+  bool runFile(const char *fileName) {
+    return check(luaL_dofile(L, fileName));
+  }
 
   bool updateFile(const char *fileName) {
     bool isEntry = strcmp(fileName, "lua/init.lua") == 0;
@@ -236,21 +245,29 @@ namespace Lua {
 } // namespace Lua
 
 extern "C" {
-void lua_compat_print(const char *string) { Bridge::serial->print(string); }
+void lua_compat_print(const char *string) {
+  Bridge::serial->print(string);
+}
 
 int lua_compat_fopen(const char *fileName) {
   return Lua::file.fopen(fileName, "r") ? 1 : 0;
 }
 
-void lua_compat_fclose() { Lua::file.fclose(); }
+void lua_compat_fclose() {
+  Lua::file.fclose();
+}
 
-int lua_compat_feof() { return Lua::file.feof(); }
+int lua_compat_feof() {
+  return Lua::file.feof();
+}
 
 size_t lua_compat_fread(void *ptr, size_t size, size_t count) {
   return Lua::file.fread(ptr, size, count);
 }
 
-int lua_compat_ferror() { return Lua::file.ferror(); }
+int lua_compat_ferror() {
+  return Lua::file.ferror();
+}
 }
 
 #endif

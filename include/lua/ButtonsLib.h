@@ -16,14 +16,20 @@ namespace ButtonsLib {
 
   const byte maxButtons = 10;
   Button buttons[maxButtons] = {
-      // Blue buttons
-      Button(10), Button(26), Button(22),
-      // Green buttons
-      Button(15), Button(31), Button(32),
-      // Encoder buttons
-      Button(23), Button(6), Button(35),
-      // Shift/Menu button
-      Button(1)};
+    // Blue buttons
+    Button(10),
+    Button(26),
+    Button(22),
+    // Green buttons
+    Button(15),
+    Button(31),
+    Button(32),
+    // Encoder buttons
+    Button(23),
+    Button(6),
+    Button(35),
+    // Shift/Menu button
+    Button(1)};
 
   Button *getButton(byte index) {
     if (index >= maxButtons) {

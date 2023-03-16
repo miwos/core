@@ -9,10 +9,11 @@ namespace FileSystemLib {
 
   char fileName[FileSystem::maxFileNameLength];
 
-  void begin() { FileSystem::begin(); }
+  void begin() {
+    FileSystem::begin();
+  }
 
   namespace lib {
-
     int listFiles(lua_State *L) {
       const char *dirName = luaL_checkstring(L, 1);
 
@@ -64,9 +65,11 @@ namespace FileSystemLib {
   } // namespace lib
 
   void install() {
-    luaL_Reg lib[] = {{"listFiles", lib::listFiles},
-        {"fileExists", lib::fileExists}, {"writeFile", lib::writeFile},
-        {NULL, NULL}};
+    luaL_Reg lib[] = {
+      {"listFiles", lib::listFiles},
+      {"fileExists", lib::fileExists},
+      {"writeFile", lib::writeFile},
+      {NULL, NULL}};
     luaL_register(Lua::L, "FileSystem", lib);
   }
 } // namespace FileSystemLib

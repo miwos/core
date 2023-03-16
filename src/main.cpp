@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <Bridge.h>
-
+#include <FileSystem.h>
+#include <SlipSerial.h>
+#include <helpers/Lua.h>
 #include <lua/BridgeLib.h>
 #include <lua/ButtonsLib.h>
 #include <lua/DisplaysLib.h>
@@ -11,10 +13,6 @@
 #include <lua/MidiLib.h>
 #include <lua/TimerLib.h>
 #include <lua/UtilsLib.h>
-
-#include <FileSystem.h>
-#include <SlipSerial.h>
-#include <helpers/Lua.h>
 
 #if defined(DEBUG) && defined(DEBUG_LOOP)
 uint32_t lastLoopTime = 0;
@@ -85,13 +83,14 @@ void loop() {
   maxLoopInterval = max(maxLoopInterval, now - lastLoopTime);
 
   if (now - lastLoopLogTime >= loopLogInterval) {
-    const char *color = maxLoopInterval < 100   ? "success"
-                        : maxLoopInterval < 500 ? "warn"
-                                                : "error";
+    const char *color = maxLoopInterval < 100 ? "success"
+      : maxLoopInterval < 500                 ? "warn"
+                                              : "error";
 
     Logger::beginInfo();
     Logger::serial->printf(
-        F("{gray Loop interval:} {%s %dμs}\n"), color, maxLoopInterval);
+      F("{gray Loop interval:} {%s %dμs}\n"), color, maxLoopInterval
+    );
     Logger::endInfo();
     lastLoopLogTime = now;
     maxLoopInterval = 0;

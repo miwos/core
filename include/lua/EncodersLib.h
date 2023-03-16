@@ -12,8 +12,10 @@ namespace EncodersLib {
 
   typedef RangeEncoder Encoder;
   const byte maxEncoders = 3;
-  RangeEncoder encoders[maxEncoders] = {RangeEncoder(3, 2, 0, 127),
-      RangeEncoder(36, 37, 0, 127), RangeEncoder(33, 34, 0, 127)};
+  RangeEncoder encoders[maxEncoders] = {
+    RangeEncoder(3, 2, 0, 127),
+    RangeEncoder(36, 37, 0, 127),
+    RangeEncoder(33, 34, 0, 127)};
 
   uint32_t lastUpdate = 0;
   uint32_t updateInterval = 5; // ms
@@ -71,7 +73,7 @@ namespace EncodersLib {
 
   void install() {
     luaL_Reg lib[] = {
-        {"write", lib::write}, {"setRange", lib::setRange}, {NULL, NULL}};
+      {"write", lib::write}, {"setRange", lib::setRange}, {NULL, NULL}};
     luaL_register(Lua::L, "Encoders", lib);
   }
 } // namespace EncodersLib

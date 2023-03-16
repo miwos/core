@@ -10,8 +10,9 @@ private:
 
 public:
   AnyMidiSerial(
-      byte index, midi::MidiInterface<midi::SerialMIDI<HardwareSerial>> *midi)
-      : AnyMidi(index) {
+    byte index, midi::MidiInterface<midi::SerialMIDI<HardwareSerial>> *midi
+  ) :
+    AnyMidi(index) {
     this->midi = midi;
   }
 
@@ -32,48 +33,48 @@ public:
 
   midi::MidiType getType(byte type) {
     switch (type) {
-    case 0x80:
-      return midi::MidiType::NoteOff;
-    case 0x90:
-      return midi::MidiType::NoteOn;
-    case 0xA0:
-      return midi::MidiType::NoteOff;
-    case 0xB0:
-      return midi::MidiType::ControlChange;
-    case 0xC0:
-      return midi::MidiType::ProgramChange;
-    case 0xD0:
-      return midi::MidiType::AfterTouchChannel;
-    case 0xE0:
-      return midi::MidiType::PitchBend;
-    case 0xF0:
-      return midi::MidiType::SystemExclusive;
-    case 0xF1:
-      return midi::MidiType::TimeCodeQuarterFrame;
-    case 0xF2:
-      return midi::MidiType::SongPosition;
-    case 0xF3:
-      return midi::MidiType::SongSelect;
-    case 0xF6:
-      return midi::MidiType::TuneRequest;
-    case 0xF7:
-      return midi::MidiType::SystemExclusiveEnd;
-    case 0xF8:
-      return midi::MidiType::Clock;
-    case 0xF9:
-      return midi::MidiType::Tick;
-    case 0xFA:
-      return midi::MidiType::Start;
-    case 0xFB:
-      return midi::MidiType::Continue;
-    case 0xFC:
-      return midi::MidiType::Stop;
-    case 0xFE:
-      return midi::MidiType::ActiveSensing;
-    case 0xFF:
-      return midi::MidiType::SystemReset;
-    default:
-      return midi::MidiType::InvalidType;
+      case 0x80:
+        return midi::MidiType::NoteOff;
+      case 0x90:
+        return midi::MidiType::NoteOn;
+      case 0xA0:
+        return midi::MidiType::NoteOff;
+      case 0xB0:
+        return midi::MidiType::ControlChange;
+      case 0xC0:
+        return midi::MidiType::ProgramChange;
+      case 0xD0:
+        return midi::MidiType::AfterTouchChannel;
+      case 0xE0:
+        return midi::MidiType::PitchBend;
+      case 0xF0:
+        return midi::MidiType::SystemExclusive;
+      case 0xF1:
+        return midi::MidiType::TimeCodeQuarterFrame;
+      case 0xF2:
+        return midi::MidiType::SongPosition;
+      case 0xF3:
+        return midi::MidiType::SongSelect;
+      case 0xF6:
+        return midi::MidiType::TuneRequest;
+      case 0xF7:
+        return midi::MidiType::SystemExclusiveEnd;
+      case 0xF8:
+        return midi::MidiType::Clock;
+      case 0xF9:
+        return midi::MidiType::Tick;
+      case 0xFA:
+        return midi::MidiType::Start;
+      case 0xFB:
+        return midi::MidiType::Continue;
+      case 0xFC:
+        return midi::MidiType::Stop;
+      case 0xFE:
+        return midi::MidiType::ActiveSensing;
+      case 0xFF:
+        return midi::MidiType::SystemReset;
+      default:
+        return midi::MidiType::InvalidType;
     };
   }
 

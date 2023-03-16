@@ -16,13 +16,13 @@ namespace LedsLib {
 
   const byte maxLeds = 7;
   Led leds[maxLeds] = {
-      {9, true},
-      {11, true},
-      {27, false},
-      {14, true},
-      {30, false},
-      {29, true},
-      {0, true},
+    {9, true},
+    {11, true},
+    {27, false},
+    {14, true},
+    {30, false},
+    {29, true},
+    {0, true},
   };
 
   byte pwmResolution = 8;

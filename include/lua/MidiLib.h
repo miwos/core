@@ -1,16 +1,15 @@
 #ifndef LuaMidiLib_h
 #define LuaMidiLib_h
 
-#include <MIDI.h>
-#include <SPI.h>
-#include <USBHost_t36.h>
-
 #include <AnyMidi.h>
 #include <AnyMidiSerial.h>
 #include <AnyMidiUsb.h>
 #include <AnyMidiUsbHub.h>
 #include <IntervalTimer.h>
 #include <Logger.h>
+#include <MIDI.h>
+#include <SPI.h>
+#include <USBHost_t36.h>
 #include <helpers/Lua.h>
 #include <lua/TimerLib.h>
 
@@ -57,9 +56,20 @@ namespace MidiLib {
 
   typedef AnyMidi Device;
   const byte maxDevices = 13;
-  Device *devices[maxDevices] = {&midiDevice1, &midiDevice2, &midiDevice3,
-      &midiDevice4, &midiDevice5, &midiDevice6, &midiDevice7, &midiDevice8,
-      &midiDevice9, &midiDevice10, &midiDevice11, &midiDevice12, &midiDevice13};
+  Device *devices[maxDevices] = {
+    &midiDevice1,
+    &midiDevice2,
+    &midiDevice3,
+    &midiDevice4,
+    &midiDevice5,
+    &midiDevice6,
+    &midiDevice7,
+    &midiDevice8,
+    &midiDevice9,
+    &midiDevice10,
+    &midiDevice11,
+    &midiDevice12,
+    &midiDevice13};
 
   int handleInputRef = -1;
   int handleClockRef = -1;
@@ -79,8 +89,9 @@ namespace MidiLib {
     return devices[index];
   }
 
-  void handleInput(byte index, byte type, byte data1, byte data2, byte channel,
-      byte cable = 0) {
+  void handleInput(
+    byte index, byte type, byte data1, byte data2, byte channel, byte cable = 0
+  ) {
 
     if (handleInputRef == -1)
       handleInputRef = Lua::storeFunction("Midi", "handleInput");
@@ -91,7 +102,7 @@ namespace MidiLib {
     lua_pushnumber(Lua::L, type);
     lua_pushnumber(Lua::L, data1);
     lua_pushnumber(Lua::L, data2);
-    lua_pushnumber(Lua::L, channel);   // Channel is already a one-based index.
+    lua_pushnumber(Lua::L, channel); // Channel is already a one-based index.
     lua_pushnumber(Lua::L, cable + 1); // Use one-based index.
     Lua::check(lua_pcall(Lua::L, 6, 0, 0));
   }
@@ -190,9 +201,15 @@ namespace MidiLib {
     handleInputRef = -1;
     handleClockRef = -1;
 
-    luaL_Reg lib[] = {{"__send", lib::send}, {"__getNoteId", lib::getNoteId},
-        {"parseNoteId", lib::parseNoteId}, {"start", lib::start},
-        {"stop", lib::stop}, {"setTempo", lib::setTempo}, {NULL, NULL}};
+    luaL_Reg lib[] = {
+      {"__send", lib::send},
+      {"__getNoteId", lib::getNoteId},
+      {"parseNoteId", lib::parseNoteId},
+      {"start", lib::start},
+      {"stop", lib::stop},
+      {"setTempo", lib::setTempo},
+      {NULL, NULL}};
+
     luaL_register(Lua::L, "Midi", lib);
   }
 } // namespace MidiLib

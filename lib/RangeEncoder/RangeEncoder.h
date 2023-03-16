@@ -61,7 +61,9 @@ public:
     encoder->write(value);
   }
 
-  ~RangeEncoder() { delete encoder; }
+  ~RangeEncoder() {
+    delete encoder;
+  }
 };
 
 #endif

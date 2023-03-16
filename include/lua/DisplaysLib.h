@@ -21,13 +21,13 @@ namespace DisplaysLib {
   typedef Adafruit_SSD1306 Display;
   const byte maxDisplays = 3;
   Display displays[maxDisplays] = {
-      Display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET),
-      Display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, OLED_RESET),
-      Display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire2, OLED_RESET)};
+    Display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET),
+    Display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, OLED_RESET),
+    Display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire2, OLED_RESET)};
 
   int needsUpdate[maxDisplays] = {false};
-  // A display update is ~12ms. If all three displays need an update 24fps would
-  // still leave enough time to draw all of them.
+  // A display update is ~12ms. If all three displays need an update 24fps
+  // would still leave enough time to draw all of them.
   byte fps = 24;
   uint32_t frameDuration = 1000 / fps; // ms
   uint32_t lastFrameTime = 0;
@@ -68,8 +68,10 @@ namespace DisplaysLib {
     if (now - lastFrameTime >= frameDuration) {
       for (int i = 0; i < maxDisplays; i++) {
         if (!needsUpdate[i]) continue;
+
         Display *display = getDisplay(i);
         if (display != NULL) display->display();
+
         needsUpdate[i] = false;
       }
       lastFrameTime = now;
@@ -113,13 +115,13 @@ namespace DisplaysLib {
       Display *display = getDisplay(index);
       if (display == NULL) return 0;
 
-      if (x0 == x1)
+      if (x0 == x1) {
         display->drawFastVLine(x0, y0, abs(y1 - y0), color);
-      else if (y0 == y1)
+      } else if (y0 == y1) {
         display->drawFastHLine(x0, y0, abs(x1 - x0), color);
-      else
+      } else {
         display->drawLine(x0, y0, x1, y1, color);
-
+      }
       return 0;
     }
 
@@ -137,11 +139,11 @@ namespace DisplaysLib {
       Display *display = getDisplay(index);
       if (display == NULL) return 0;
 
-      if (fill)
+      if (fill) {
         display->fillTriangle(x0, y0, x1, y1, x2, y2, color);
-      else
+      } else {
         display->drawTriangle(x0, y0, x1, y1, x2, y2, color);
-
+      }
       return 0;
     }
 
@@ -157,11 +159,11 @@ namespace DisplaysLib {
       Display *display = getDisplay(index);
       if (display == NULL) return 0;
 
-      if (fill)
+      if (fill) {
         display->fillRect(x, y, width, height, color);
-      else
+      } else {
         display->drawRect(x, y, width, height, color);
-
+      }
       return 0;
     }
 
@@ -178,11 +180,11 @@ namespace DisplaysLib {
       Display *display = getDisplay(index);
       if (display == NULL) return 0;
 
-      if (fill)
+      if (fill) {
         display->fillRoundRect(x, y, width, height, radius, color);
-      else
+      } else {
         display->drawRoundRect(x, y, width, height, radius, color);
-
+      }
       return 0;
     }
 
@@ -197,11 +199,11 @@ namespace DisplaysLib {
       Display *display = getDisplay(index);
       if (display == NULL) return 0;
 
-      if (fill)
+      if (fill) {
         display->fillCircle(x, y, radius, color);
-      else
+      } else {
         display->drawCircle(x, y, radius, color);
-
+      }
       return 0;
     }
 
@@ -220,12 +222,18 @@ namespace DisplaysLib {
   } // namespace lib
 
   void install() {
-    luaL_Reg lib[] = {{"text", lib::text}, {"drawPixel", lib::drawPixel},
-        {"drawLine", lib::drawLine}, {"drawTriangle", lib::drawTriangle},
-        {"drawRectangle", lib::drawRectangle},
-        {"drawRoundedRectangle", lib::drawRoundedRectangle},
-        {"drawCircle", lib::drawCircle}, {"update", lib::update},
-        {"clear", lib::clear}, {NULL, NULL}};
+    luaL_Reg lib[] = {
+      {"text", lib::text},
+      {"drawPixel", lib::drawPixel},
+      {"drawLine", lib::drawLine},
+      {"drawTriangle", lib::drawTriangle},
+      {"drawRectangle", lib::drawRectangle},
+      {"drawRoundedRectangle", lib::drawRoundedRectangle},
+      {"drawCircle", lib::drawCircle},
+      {"update", lib::update},
+      {"clear", lib::clear},
+      {NULL, NULL}};
+
     luaL_register(Lua::L, "Displays", lib);
   }
 } // namespace DisplaysLib

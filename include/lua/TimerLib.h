@@ -98,9 +98,9 @@ namespace TimerLib {
       byte data1 = luaL_checkint(L, 4);
       byte data2 = luaL_checkint(L, 5);
       byte channel =
-          luaL_checkint(L, 6) - 1; // use zero-based index (for storage)
+        luaL_checkint(L, 6) - 1; // use zero-based index (for storage)
       byte deviceIndex = luaL_checkint(L, 7) - 1; // use zero-based index
-      byte cable = luaL_checkint(L, 8) - 1;       // use zero-based index
+      byte cable = luaL_checkint(L, 8) - 1; // use zero-based index
 
       byte status = type | channel;
       uint32_t message = (status << 16) | (data1 << 8) | data2;
@@ -130,13 +130,20 @@ namespace TimerLib {
 
   void install() {
     updateRef = -1;
-    luaL_Reg lib[] = {{"millis", lib::millis}, {"micros", lib::micros},
-        {"ticks", lib::ticks}, {"_scheduleMidi", lib::scheduleMidi},
-        {NULL, NULL}};
+
+    luaL_Reg lib[] = {
+      {"millis", lib::millis},
+      {"micros", lib::micros},
+      {"ticks", lib::ticks},
+      {"_scheduleMidi", lib::scheduleMidi},
+      {NULL, NULL}};
+
     luaL_register(Lua::L, "Timer", lib);
   }
 
-  void onEvent(EventHandler handler) { handleEvent = handler; }
+  void onEvent(EventHandler handler) {
+    handleEvent = handler;
+  }
 } // namespace TimerLib
 
 #endif

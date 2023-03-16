@@ -43,9 +43,12 @@ namespace UtilsLib {
   } // namespace lib
 
   void install() {
-    luaL_Reg lib[] = {{"packBytes", lib::packBytes},
-        {"unpackBytes", lib::unpackBytes}, {"setBit", lib::setBit},
-        {NULL, NULL}};
+    luaL_Reg lib[] = {
+      {"packBytes", lib::packBytes},
+      {"unpackBytes", lib::unpackBytes},
+      {"setBit", lib::setBit},
+      {NULL, NULL}};
+
     luaL_register(Lua::L, "Utils", lib);
   }
 } // namespace UtilsLib

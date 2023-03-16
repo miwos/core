@@ -11,9 +11,13 @@ public:
   enum Type { ActiveLow, ActiveHigh };
   Type type = Type::ActiveLow;
 
-  Button(byte pin) { this->pin = pin; }
+  Button(byte pin) {
+    this->pin = pin;
+  }
 
-  void begin() { pinMode(pin, INPUT_PULLUP); }
+  void begin() {
+    pinMode(pin, INPUT_PULLUP);
+  }
 
   bool read() {
     bool value = digitalRead(pin);

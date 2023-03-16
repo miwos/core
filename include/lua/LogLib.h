@@ -62,8 +62,12 @@ namespace LogLib {
   } // namespace lib
 
   void install() {
-    luaL_Reg lib[] = {{"_log", lib::log}, {"flush", lib::flush},
-        {"stack", lib::stack}, {NULL, NULL}};
+    luaL_Reg lib[] = {
+      {"_log", lib::log},
+      {"flush", lib::flush},
+      {"stack", lib::stack},
+      {NULL, NULL}};
+
     luaL_register(Lua::L, "Log", lib);
   }
 } // namespace LogLib
