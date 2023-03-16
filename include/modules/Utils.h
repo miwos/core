@@ -1,9 +1,9 @@
-#ifndef LuaUtils_h
-#define LuaUtils_h
+#ifndef MiwosUtils_h
+#define MiwosUtils_h
 
-#include <Lua.h>
+#include <helpers/Lua.h>
 
-namespace LuaUtils {
+namespace Utils { namespace API {
   int packBytes(lua_State *L) {
     byte numArguments = lua_gettop(L);
 
@@ -44,6 +44,6 @@ namespace LuaUtils {
         {"setBit", setBit}, {NULL, NULL}};
     luaL_register(Lua::L, "Utils", lib);
   }
-} // namespace LuaUtils
+}} // namespace Utils::API
 
 #endif

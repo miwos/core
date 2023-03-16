@@ -1,23 +1,20 @@
 #include <Arduino.h>
 #include <Bridge.h>
-#include <Buttons.h>
-#include <Displays.h>
-#include <Encoders.h>
+
+#include <modules/Bridge.h>
+#include <modules/Buttons.h>
+#include <modules/Displays.h>
+#include <modules/Encoders.h>
+#include <modules/FileSystem.h>
+#include <modules/Leds.h>
+#include <modules/Log.h>
+#include <modules/Midi.h>
+#include <modules/Timer.h>
+#include <modules/Utils.h>
+
 #include <FileSystem.h>
-#include <Leds.h>
-#include <Lua.h>
-#include <LuaBridge.h>
-#include <LuaButtons.h>
-#include <LuaDisplays.h>
-#include <LuaEncoders.h>
-#include <LuaFileSystem.h>
-#include <LuaLeds.h>
-#include <LuaLog.h>
-#include <LuaMidi.h>
-#include <LuaTimer.h>
-#include <LuaUtils.h>
-#include <MidiDevices.h>
 #include <SlipSerial.h>
+#include <helpers/Lua.h>
 
 #if defined(DEBUG) && defined(DEBUG_LOOP)
 uint32_t lastLoopTime = 0;
@@ -37,16 +34,16 @@ void setup() {
   // }
 
   Lua::onSetup([]() {
-    LuaBridge::install();
-    LuaButtons::install();
-    LuaDisplays::install();
-    LuaEncoders::install();
-    LuaFileSystem::install();
-    LuaLeds::install();
-    LuaLog::install();
-    LuaMidi::install();
-    LuaTimer::install();
-    LuaUtils::install();
+    ModuleBridge::API::install();
+    Buttons::API::install();
+    Displays::API::install();
+    Encoders::API::install();
+    MyFileSystem::API::install();
+    Leds::API::install();
+    Log::API::install();
+    Midi::API::install();
+    Timer::API::install();
+    Utils::API::install();
   });
 
   Bridge::begin(serial);
@@ -54,19 +51,16 @@ void setup() {
   Displays::begin();
   FileSystem::begin();
   Leds::begin();
-  MidiDevices::begin();
+  Midi::begin();
 
   Lua::begin();
-  LuaBridge::begin();
-  LuaButtons::begin();
-  LuaEncoders::begin();
-  LuaMidi::begin();
+  ModuleBridge::begin();
 
   // Prevent auto-running `init.lua` by holding down the menu button when
   // powering on the device. This is useful for debugging, for example if there
   // is an infinite loop in `init.lua` that would cause the device to freeze
   // immediately at startup.
-  if (!Buttons::buttons[9]->read()) Lua::runFile("lua/init.lua");
+  if (!Buttons::buttons[9].read()) Lua::runFile("lua/init.lua");
 
   // Simple echo, useful for debugging bridge communication between the miwos
   // app and device.
@@ -82,9 +76,9 @@ void loop() {
   Bridge::update();
   Buttons::update();
   Encoders::update();
-  MidiDevices::update();
-  LuaTimer::update();
-  LuaDisplays::update();
+  Midi::update();
+  Timer::update();
+  Displays::update();
 
 #if defined(DEBUG) && defined(DEBUG_LOOP)
   uint32_t now = micros();

@@ -1,19 +1,20 @@
-#ifndef Leds_h
-#define Leds_h
+#ifndef MiwosLeds_h
+#define MiwosLeds_h
 
 #include <Arduino.h>
 #include <Logger.h>
 
 namespace Leds {
-  const byte ON = 255;
-  const byte OFF = 0;
-  const byte maxLeds = 7;
+  using Logger::beginError;
+  using Logger::endError;
+  using Logger::serial;
 
   struct Led {
     byte pin;
     bool pwm;
   };
 
+  const byte maxLeds = 7;
   Led leds[maxLeds] = {
       {9, true},
       {11, true},
@@ -30,10 +31,10 @@ namespace Leds {
 
   void write(byte index, byte intensity) {
     if (index >= maxLeds) {
-      Logger::beginError();
+      beginError();
       // Increase the index to be consistent with lua's index.
-      Logger::serial->printf(F("LED #%d doesn't exist."), index + 1);
-      Logger::endError();
+      serial->printf(F("LED #%d doesn't exist."), index + 1);
+      endError();
       return;
     }
     byte pin = leds[index].pin;
@@ -53,6 +54,20 @@ namespace Leds {
       write(i, 0);
     }
   }
-}; // namespace Leds
+
+  namespace API {
+    int write(lua_State *L) {
+      byte index = luaL_checknumber(L, 1) - 1; // Use zero-based index.
+      byte intensity = luaL_checknumber(L, 2);
+      Leds::write(index, intensity);
+      return 0;
+    }
+
+    void install() {
+      const luaL_reg library[] = {{"write", write}, {NULL, NULL}};
+      luaL_register(Lua::L, "Leds", library);
+    }
+  } // namespace API
+};  // namespace Leds
 
 #endif

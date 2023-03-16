@@ -1,37 +1,16 @@
-#ifndef LuaBridge_h
-#define LuaBridge_h
+#ifndef MiwosBridge_h
+#define MiwosBridge_h
 
 #include <Bridge.h>
-#include <Lua.h>
+#include <helpers/Lua.h>
 
-namespace LuaBridge {
+namespace ModuleBridge {
   using Bridge::Data;
   using Bridge::RequestId;
 
   namespace {
     int handleOscRef = -1;
   };
-
-  int notify(lua_State *L) {
-    const char *address = luaL_checkstring(L, 1);
-    byte numArguments = lua_gettop(L);
-    OSCMessage message(address);
-
-    // Skip first argument (osc address).
-    for (byte i = 2; i <= numArguments; i++) {
-      int type = lua_type(L, i);
-      if (type == LUA_TBOOLEAN) {
-        message.add(lua_toboolean(L, i));
-      } else if (type == LUA_TNUMBER) {
-        message.add(lua_tonumber(L, i));
-      } else if (type == LUA_TSTRING) {
-        message.add(lua_tostring(L, i));
-      }
-    }
-
-    Bridge::sendOscMessage(message);
-    return 0;
-  }
 
   void begin() {
     Bridge::addMethod("/e/*/*", [](Data &data) {
@@ -87,11 +66,35 @@ namespace LuaBridge {
     });
   }
 
-  void install() {
-    handleOscRef = -1;
-    luaL_Reg lib[] = {{"notify", notify}, {NULL, NULL}};
-    luaL_register(Lua::L, "Bridge", lib);
-  }
-} // namespace LuaBridge
+  namespace API {
+    int notify(lua_State *L) {
+      const char *address = luaL_checkstring(L, 1);
+      byte numArguments = lua_gettop(L);
+      OSCMessage message(address);
+
+      // Skip first argument (osc address).
+      for (byte i = 2; i <= numArguments; i++) {
+        int type = lua_type(L, i);
+        if (type == LUA_TBOOLEAN) {
+          message.add(lua_toboolean(L, i));
+        } else if (type == LUA_TNUMBER) {
+          message.add(lua_tonumber(L, i));
+        } else if (type == LUA_TSTRING) {
+          message.add(lua_tostring(L, i));
+        }
+      }
+
+      Bridge::sendOscMessage(message);
+      return 0;
+    }
+
+    void install() {
+      handleOscRef = -1;
+      luaL_Reg lib[] = {{"notify", notify}, {NULL, NULL}};
+      luaL_register(Lua::L, "Bridge", lib);
+    }
+  } // namespace API
+
+} // namespace ModuleBridge
 
 #endif
