@@ -1,17 +1,17 @@
-#ifndef MiwosFileSystem_h
-#define MiwosFileSystem_h
+#ifndef LuaFileSystemLib_h
+#define LuaFileSystemLib_h
 
 #include <FileSystem.h>
 #include <helpers/Lua.h>
 
-namespace MyFileSystem {
+namespace FileSystemLib {
   using FileSystem::sd;
 
   char fileName[FileSystem::maxFileNameLength];
 
   void begin() { FileSystem::begin(); }
 
-  namespace API {
+  namespace lib {
 
     int listFiles(lua_State *L) {
       const char *dirName = luaL_checkstring(L, 1);
@@ -61,13 +61,14 @@ namespace MyFileSystem {
       lua_pushboolean(L, result > -1);
       return 1;
     }
+  } // namespace lib
 
-    void install() {
-      luaL_Reg lib[] = {{"listFiles", listFiles}, {"fileExists", fileExists},
-          {"writeFile", writeFile}, {NULL, NULL}};
-      luaL_register(Lua::L, "FileSystem", lib);
-    }
-  } // namespace API
-} // namespace MyFileSystem
+  void install() {
+    luaL_Reg lib[] = {{"listFiles", lib::listFiles},
+        {"fileExists", lib::fileExists}, {"writeFile", lib::writeFile},
+        {NULL, NULL}};
+    luaL_register(Lua::L, "FileSystem", lib);
+  }
+} // namespace FileSystemLib
 
 #endif

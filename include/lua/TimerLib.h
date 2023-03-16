@@ -1,11 +1,11 @@
-#ifndef MiwosTimer_h
-#define MiwosTimer_h
+#ifndef LuaTimerLib_h
+#define LuaTimerLib_h
 
 #include <Arduino.h>
 #include <Logger.h>
 #include <helpers/Lua.h>
 
-namespace Timer {
+namespace TimerLib {
   using Logger::beginInfo;
   using Logger::endInfo;
   using Logger::serial;
@@ -60,7 +60,7 @@ namespace Timer {
     }
   }
 
-  namespace API {
+  namespace lib {
 
     int millis(lua_State *L) {
       lua_pushinteger(Lua::L, ::millis());
@@ -126,16 +126,17 @@ namespace Timer {
       lua_pushboolean(L, true);
       return 1;
     }
+  } // namespace lib
 
-    void install() {
-      updateRef = -1;
-      luaL_Reg lib[] = {{"millis", millis}, {"micros", micros},
-          {"ticks", ticks}, {"_scheduleMidi", scheduleMidi}, {NULL, NULL}};
-      luaL_register(Lua::L, "Timer", lib);
-    }
-  } // namespace API
+  void install() {
+    updateRef = -1;
+    luaL_Reg lib[] = {{"millis", lib::millis}, {"micros", lib::micros},
+        {"ticks", lib::ticks}, {"_scheduleMidi", lib::scheduleMidi},
+        {NULL, NULL}};
+    luaL_register(Lua::L, "Timer", lib);
+  }
 
   void onEvent(EventHandler handler) { handleEvent = handler; }
-} // namespace Timer
+} // namespace TimerLib
 
 #endif

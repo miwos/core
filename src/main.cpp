@@ -1,16 +1,16 @@
 #include <Arduino.h>
 #include <Bridge.h>
 
-#include <modules/Bridge.h>
-#include <modules/Buttons.h>
-#include <modules/Displays.h>
-#include <modules/Encoders.h>
-#include <modules/FileSystem.h>
-#include <modules/Leds.h>
-#include <modules/Log.h>
-#include <modules/Midi.h>
-#include <modules/Timer.h>
-#include <modules/Utils.h>
+#include <lua/BridgeLib.h>
+#include <lua/ButtonsLib.h>
+#include <lua/DisplaysLib.h>
+#include <lua/EncodersLib.h>
+#include <lua/FileSystemLib.h>
+#include <lua/LedsLib.h>
+#include <lua/LogLib.h>
+#include <lua/MidiLib.h>
+#include <lua/TimerLib.h>
+#include <lua/UtilsLib.h>
 
 #include <FileSystem.h>
 #include <SlipSerial.h>
@@ -30,37 +30,37 @@ SlipSerial serial(Serial);
 
 void setup() {
   Serial.begin(9600);
-  // while (!Serial) {
-  // }
+  // Activate this if you don't want to miss any serial when debugging:
+  // while (!Serial) {}
 
   Lua::onSetup([]() {
-    ModuleBridge::API::install();
-    Buttons::API::install();
-    Displays::API::install();
-    Encoders::API::install();
-    MyFileSystem::API::install();
-    Leds::API::install();
-    Log::API::install();
-    Midi::API::install();
-    Timer::API::install();
-    Utils::API::install();
+    BridgeLib::install();
+    ButtonsLib::install();
+    DisplaysLib::install();
+    EncodersLib::install();
+    FileSystemLib::install();
+    LedsLib::install();
+    LogLib::install();
+    MidiLib::install();
+    TimerLib::install();
+    UtilsLib::install();
   });
 
   Bridge::begin(serial);
-  Buttons::begin();
-  Displays::begin();
-  FileSystem::begin();
-  Leds::begin();
-  Midi::begin();
-
   Lua::begin();
-  ModuleBridge::begin();
+
+  ButtonsLib::begin();
+  DisplaysLib::begin();
+  FileSystemLib::begin();
+  LedsLib::begin();
+  MidiLib::begin();
+  BridgeLib::begin();
 
   // Prevent auto-running `init.lua` by holding down the menu button when
   // powering on the device. This is useful for debugging, for example if there
   // is an infinite loop in `init.lua` that would cause the device to freeze
   // immediately at startup.
-  if (!Buttons::buttons[9].read()) Lua::runFile("lua/init.lua");
+  if (!ButtonsLib::buttons[9].read()) Lua::runFile("lua/init.lua");
 
   // Simple echo, useful for debugging bridge communication between the miwos
   // app and device.
@@ -74,11 +74,11 @@ void setup() {
 
 void loop() {
   Bridge::update();
-  Buttons::update();
-  Encoders::update();
-  Midi::update();
-  Timer::update();
-  Displays::update();
+  ButtonsLib::update();
+  EncodersLib::update();
+  MidiLib::update();
+  TimerLib::update();
+  DisplaysLib::update();
 
 #if defined(DEBUG) && defined(DEBUG_LOOP)
   uint32_t now = micros();

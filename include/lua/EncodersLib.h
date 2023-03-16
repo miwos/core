@@ -1,11 +1,11 @@
-#ifndef MiwosEncoders_h
-#define MiwosEncoders_h
+#ifndef LuaEncodersLib_h
+#define LuaEncodersLib_h
 
 #include <Logger.h>
 #include <RangeEncoder.h>
 #include <helpers/Lua.h>
 
-namespace Encoders {
+namespace EncodersLib {
   using Logger::beginError;
   using Logger::endError;
   using Logger::serial;
@@ -49,11 +49,11 @@ namespace Encoders {
     lastUpdate = now;
   }
 
-  namespace API {
+  namespace lib {
     int write(lua_State *L) {
       byte index = lua_tonumber(Lua::L, 1) - 1; // zero-based index
       int32_t value = lua_tonumber(Lua::L, 2);
-      RangeEncoder *encoder = Encoders::getEncoder(index);
+      RangeEncoder *encoder = getEncoder(index);
       if (encoder != NULL) encoder->write(value);
       return 0;
     }
@@ -63,16 +63,17 @@ namespace Encoders {
       int32_t min = luaL_checkinteger(Lua::L, 2);
       int32_t max = luaL_checkinteger(Lua::L, 3);
 
-      RangeEncoder *encoder = Encoders::getEncoder(index);
+      RangeEncoder *encoder = getEncoder(index);
       if (encoder != NULL) encoder->setRange(min, max);
       return 0;
     }
+  } // namespace lib
 
-    void install() {
-      luaL_Reg lib[] = {{"write", write}, {"setRange", setRange}, {NULL, NULL}};
-      luaL_register(Lua::L, "Encoders", lib);
-    }
-  } // namespace API
-} // namespace Encoders
+  void install() {
+    luaL_Reg lib[] = {
+        {"write", lib::write}, {"setRange", lib::setRange}, {NULL, NULL}};
+    luaL_register(Lua::L, "Encoders", lib);
+  }
+} // namespace EncodersLib
 
 #endif

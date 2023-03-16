@@ -1,5 +1,5 @@
-#ifndef MiwosDisplays_h
-#define MiwosDisplays_h
+#ifndef MiwosDisplaysLib_h
+#define MiwosDisplaysLib_h
 
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -13,7 +13,7 @@
 #define BLACK SSD1306_BLACK
 #define OLED_RESET 4
 
-namespace Displays {
+namespace DisplaysLib {
   using Logger::beginError;
   using Logger::endError;
   using Logger::serial;
@@ -25,7 +25,7 @@ namespace Displays {
       Display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire1, OLED_RESET),
       Display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire2, OLED_RESET)};
 
-  int needsUpdate[Displays::maxDisplays] = {false};
+  int needsUpdate[maxDisplays] = {false};
   // A display update is ~12ms. If all three displays need an update 24fps would
   // still leave enough time to draw all of them.
   byte fps = 24;
@@ -76,13 +76,13 @@ namespace Displays {
     }
   }
 
-  namespace API {
+  namespace lib {
     int text(lua_State *L) {
       byte index = luaL_checknumber(L, 1) - 1; // Use zero-based index.
       const char *text = luaL_checkstring(L, 2);
       byte color = luaL_checknumber(L, 3);
 
-      Display *display = Displays::getDisplay(index);
+      Display *display = getDisplay(index);
       if (display == NULL) return 0;
 
       display->setCursor(0, 17);
@@ -97,7 +97,7 @@ namespace Displays {
       byte y = luaL_checknumber(L, 3);
       byte color = luaL_checknumber(L, 4);
 
-      Display *display = Displays::getDisplay(index);
+      Display *display = getDisplay(index);
       if (display != NULL) display->drawPixel(x, y, color);
       return 0;
     }
@@ -110,7 +110,7 @@ namespace Displays {
       byte y1 = luaL_checknumber(L, 5);
       byte color = luaL_checknumber(L, 6);
 
-      Display *display = Displays::getDisplay(index);
+      Display *display = getDisplay(index);
       if (display == NULL) return 0;
 
       if (x0 == x1)
@@ -134,7 +134,7 @@ namespace Displays {
       byte color = luaL_checknumber(L, 8);
       bool fill = lua_toboolean(L, 9);
 
-      Display *display = Displays::getDisplay(index);
+      Display *display = getDisplay(index);
       if (display == NULL) return 0;
 
       if (fill)
@@ -154,7 +154,7 @@ namespace Displays {
       byte color = luaL_checknumber(L, 6);
       bool fill = lua_toboolean(L, 7);
 
-      Display *display = Displays::getDisplay(index);
+      Display *display = getDisplay(index);
       if (display == NULL) return 0;
 
       if (fill)
@@ -175,7 +175,7 @@ namespace Displays {
       byte color = luaL_checknumber(L, 7);
       bool fill = lua_toboolean(L, 8);
 
-      Display *display = Displays::getDisplay(index);
+      Display *display = getDisplay(index);
       if (display == NULL) return 0;
 
       if (fill)
@@ -194,7 +194,7 @@ namespace Displays {
       byte color = luaL_checknumber(L, 5);
       bool fill = lua_toboolean(L, 6);
 
-      Display *display = Displays::getDisplay(index);
+      Display *display = getDisplay(index);
       if (display == NULL) return 0;
 
       if (fill)
@@ -207,27 +207,27 @@ namespace Displays {
 
     int update(lua_State *L) {
       byte index = lua_tonumber(L, 1) - 1; // Use zero-based index.
-      if (Displays::getDisplay(index) != NULL) needsUpdate[index] = true;
+      if (getDisplay(index) != NULL) needsUpdate[index] = true;
       return 0;
     }
 
     int clear(lua_State *L) {
       byte index = lua_tonumber(L, 1) - 1; // Use zero-based index.
-      Display *display = Displays::getDisplay(index);
+      Display *display = getDisplay(index);
       if (display != NULL) display->clearDisplay();
       return 0;
     }
+  } // namespace lib
 
-    void install() {
-      luaL_Reg lib[] = {{"text", text}, {"drawPixel", drawPixel},
-          {"drawLine", drawLine}, {"drawTriangle", drawTriangle},
-          {"drawRectangle", drawRectangle},
-          {"drawRoundedRectangle", drawRoundedRectangle},
-          {"drawCircle", drawCircle}, {"update", update}, {"clear", clear},
-          {NULL, NULL}};
-      luaL_register(Lua::L, "Displays", lib);
-    }
-  } // namespace API
-} // namespace Displays
+  void install() {
+    luaL_Reg lib[] = {{"text", lib::text}, {"drawPixel", lib::drawPixel},
+        {"drawLine", lib::drawLine}, {"drawTriangle", lib::drawTriangle},
+        {"drawRectangle", lib::drawRectangle},
+        {"drawRoundedRectangle", lib::drawRoundedRectangle},
+        {"drawCircle", lib::drawCircle}, {"update", lib::update},
+        {"clear", lib::clear}, {NULL, NULL}};
+    luaL_register(Lua::L, "Displays", lib);
+  }
+} // namespace DisplaysLib
 
 #endif

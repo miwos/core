@@ -1,5 +1,5 @@
-#ifndef MiwosMidi_h
-#define MiwosMidi_h
+#ifndef LuaMidiLib_h
+#define LuaMidiLib_h
 
 #include <MIDI.h>
 #include <SPI.h>
@@ -12,7 +12,7 @@
 #include <IntervalTimer.h>
 #include <Logger.h>
 #include <helpers/Lua.h>
-#include <modules/Timer.h>
+#include <lua/TimerLib.h>
 
 // Midi via USB/Power port.
 AnyMidiUsb midiDevice1(0);
@@ -50,7 +50,7 @@ AnyMidiUsbHub midiDevice11(10, &hubMidi8);
 AnyMidiUsbHub midiDevice12(11, &hubMidi9);
 AnyMidiUsbHub midiDevice13(12, &hubMidi10);
 
-namespace Midi {
+namespace MidiLib {
   using Logger::beginError;
   using Logger::endError;
   using Logger::serial;
@@ -113,9 +113,9 @@ namespace Midi {
   void handleMidiClock() {
     // TODO: sync selected midi devices
     usbMIDI.sendRealTime(usbMIDI.Clock);
-    Timer::updateEvents(currentTick, true);
+    TimerLib::updateEvents(currentTick, true);
     currentTick++;
-    Timer::currentTick = currentTick;
+    TimerLib::currentTick = currentTick;
   }
 
   void begin() {
@@ -124,7 +124,7 @@ namespace Midi {
       devices[i]->begin();
       devices[i]->onInput(handleInput);
     }
-    Timer::onEvent(handleTimerEvent);
+    TimerLib::onEvent(handleTimerEvent);
   }
 
   void update() {
@@ -134,7 +134,7 @@ namespace Midi {
     }
   }
 
-  namespace API {
+  namespace lib {
 
     int send(lua_State *L) {
       byte index = lua_tonumber(L, 1) - 1; // Use zero-based index.
@@ -184,17 +184,17 @@ namespace Midi {
       clockTimer.end();
       return 0;
     }
+  } // namespace lib
 
-    void install() {
-      handleInputRef = -1;
-      handleClockRef = -1;
+  void install() {
+    handleInputRef = -1;
+    handleClockRef = -1;
 
-      luaL_Reg lib[] = {{"__send", send}, {"__getNoteId", getNoteId},
-          {"parseNoteId", parseNoteId}, {"start", start}, {"stop", stop},
-          {"setTempo", setTempo}, {NULL, NULL}};
-      luaL_register(Lua::L, "Midi", lib);
-    }
-  } // namespace API
-} // namespace Midi
+    luaL_Reg lib[] = {{"__send", lib::send}, {"__getNoteId", lib::getNoteId},
+        {"parseNoteId", lib::parseNoteId}, {"start", lib::start},
+        {"stop", lib::stop}, {"setTempo", lib::setTempo}, {NULL, NULL}};
+    luaL_register(Lua::L, "Midi", lib);
+  }
+} // namespace MidiLib
 
 #endif

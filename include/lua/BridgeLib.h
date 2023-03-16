@@ -1,10 +1,10 @@
-#ifndef MiwosBridge_h
-#define MiwosBridge_h
+#ifndef LuaBridgeLib_h
+#define LuaBridgeLib_h
 
 #include <Bridge.h>
 #include <helpers/Lua.h>
 
-namespace ModuleBridge {
+namespace BridgeLib {
   using Bridge::Data;
   using Bridge::RequestId;
 
@@ -66,7 +66,7 @@ namespace ModuleBridge {
     });
   }
 
-  namespace API {
+  namespace lib {
     int notify(lua_State *L) {
       const char *address = luaL_checkstring(L, 1);
       byte numArguments = lua_gettop(L);
@@ -88,13 +88,14 @@ namespace ModuleBridge {
       return 0;
     }
 
-    void install() {
-      handleOscRef = -1;
-      luaL_Reg lib[] = {{"notify", notify}, {NULL, NULL}};
-      luaL_register(Lua::L, "Bridge", lib);
-    }
-  } // namespace API
+  } // namespace lib
 
-} // namespace ModuleBridge
+  void install() {
+    handleOscRef = -1;
+    luaL_Reg lib[] = {{"notify", lib::notify}, {NULL, NULL}};
+    luaL_register(Lua::L, "Bridge", lib);
+  }
+
+} // namespace BridgeLib
 
 #endif

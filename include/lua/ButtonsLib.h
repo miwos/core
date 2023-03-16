@@ -1,12 +1,12 @@
-#ifndef MiwosButtons_h
-#define MiwosButtons_h
+#ifndef LuaButtonsLib_h
+#define LuaButtonsLib_h
 
 #include <Arduino.h>
 #include <Button.h>
 #include <Logger.h>
 #include <helpers/Lua.h>
 
-namespace Buttons {
+namespace ButtonsLib {
   using Logger::beginError;
   using Logger::endError;
   using Logger::serial;
@@ -63,21 +63,21 @@ namespace Buttons {
     lastUpdate = currentTime;
   }
 
-  namespace API {
+  namespace lib {
     int read(lua_State *L) {
       byte index = luaL_checknumber(Lua::L, 1) - 1; // zero-based index
-      Button *button = Buttons::getButton(index);
+      Button *button = getButton(index);
       if (button == NULL) return 1;
 
       lua_pushboolean(Lua::L, button->read());
       return 0;
     }
+  } // namespace lib
 
-    void install() {
-      luaL_Reg lib[] = {{"read", read}, {NULL, NULL}};
-      luaL_register(Lua::L, "Buttons", lib);
-    }
-  } // namespace API
-} // namespace Buttons
+  void install() {
+    luaL_Reg lib[] = {{"read", lib::read}, {NULL, NULL}};
+    luaL_register(Lua::L, "Buttons", lib);
+  }
+} // namespace ButtonsLib
 
 #endif
