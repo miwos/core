@@ -27,22 +27,6 @@ namespace LuaMidi {
     return 0;
   }
 
-  int parseNoteId(lua_State *L) {
-    int noteId = lua_tonumber(L, 1);
-    byte note = noteId & 0XFF;
-    byte channel = (noteId & 0XFF00) >> 8;
-    lua_pushnumber(Lua::L, note);
-    lua_pushnumber(Lua::L, channel);
-    return 2;
-  }
-
-  int getNoteId(lua_State *L) {
-    byte note = lua_tonumber(L, 1);
-    byte channel = lua_tonumber(L, 2);
-    lua_pushnumber(Lua::L, ((channel & 0xFF) << 8) | (note & 0xFF));
-    return 1;
-  }
-
   void handleInput(byte index, byte type, byte data1, byte data2, byte channel,
       byte cable = 0) {
 
@@ -114,8 +98,7 @@ namespace LuaMidi {
     handleInputRef = -1;
     handleClockRef = -1;
 
-    luaL_Reg lib[] = {{"__send", send}, {"__getNoteId", getNoteId},
-        {"parseNoteId", parseNoteId}, {"start", start}, {"stop", stop},
+    luaL_Reg lib[] = {{"__send", send}, {"start", start}, {"stop", stop},
         {"setTempo", setTempo}, {NULL, NULL}};
     luaL_register(Lua::L, "Midi", lib);
   }

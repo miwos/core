@@ -15,6 +15,7 @@
 #include <LuaLog.h>
 #include <LuaMidi.h>
 #include <LuaTimer.h>
+#include <LuaUtils.h>
 #include <MidiDevices.h>
 #include <SlipSerial.h>
 
@@ -45,6 +46,7 @@ void setup() {
     LuaLog::install();
     LuaMidi::install();
     LuaTimer::install();
+    LuaUtils::install();
   });
 
   Bridge::begin(serial);
